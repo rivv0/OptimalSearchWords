@@ -6,6 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
+#include <ctime>
 #include <cstdlib>
 
 struct CORS {
@@ -82,6 +83,26 @@ int main() {
     Trie trie;
     
     loadWordsFromFile(trie, "words.txt");
+
+    CROW_ROUTE(app, "/")
+    ([](){
+        crow::response res;
+        res.add_header("Access-Control-Allow-Origin", "*");
+        res.add_header("Content-Type", "application/json");
+        res.code = 200;
+        res.body = R"({"status": "ok", "message": "Word Lookup API is running", "endpoints": ["/search/<word>", "/insert/<word>", "/remove/<word>", "/define/<word>"]})";
+        return res;
+    });
+
+    CROW_ROUTE(app, "/health")
+    ([](){
+        crow::response res;
+        res.add_header("Access-Control-Allow-Origin", "*");
+        res.add_header("Content-Type", "application/json");
+        res.code = 200;
+        res.body = R"({"status": "healthy", "timestamp": ")" + std::to_string(time(nullptr)) + R"("})";
+        return res;
+    });
 
     CROW_ROUTE(app, "/<path>")
         .methods("OPTIONS"_method)([](const crow::request&, const std::string&){
@@ -204,12 +225,23 @@ int main() {
         }
     });
 
-    std::cout << "Starting server on port 8080..." << std::endl;
     int port = 8080;
     const char* port_env = std::getenv("PORT");
     if (port_env) {
         port = std::atoi(port_env);
+        std::cout << "Using PORT from environment: " << port << std::endl;
+    } else {
+        std::cout << "Using default port: " << port << std::endl;
     }
+    
+    std::cout << "Starting Word Lookup API server..." << std::endl;
+    std::cout << "Available endpoints:" << std::endl;
+    std::cout << "  GET  /           - API status" << std::endl;
+    std::cout << "  GET  /health     - Health check" << std::endl;
+    std::cout << "  GET  /search/<word> - Search autocomplete" << std::endl;
+    std::cout << "  GET  /insert/<word> - Insert word" << std::endl;
+    std::cout << "  GET  /remove/<word> - Remove word" << std::endl;
+    std::cout << "  GET  /define/<word> - Get definition" << std::endl;
     
     app.port(port).multithreaded().run();
 }
