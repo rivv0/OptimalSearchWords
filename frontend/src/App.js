@@ -259,13 +259,31 @@ function App() {
     if (!query.trim()) return;
 
     try {
-      const response = await fetch(`${API_BASE}/search/${encodeURIComponent(query.trim())}`);
+      const url = `${API_BASE}/search/${encodeURIComponent(query.trim())}`;
+      console.log('Making realtime search request to:', url);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      console.log('Realtime search response status:', response.status);
+      
       const data = await response.json();
+      console.log('Realtime search response data:', data);
+      
       if (response.ok) {
         setRealtimeResults(data.suggestions || []);
       }
     } catch (err) {
       console.error("Realtime search error:", err);
+      console.error("Error details:", {
+        name: err.name,
+        message: err.message,
+        url: `${API_BASE}/search/${encodeURIComponent(query.trim())}`
+      });
     }
   };
 
@@ -338,6 +356,28 @@ function App() {
   const selectSuggestion = (word) => {
     setQuery(word);
     setRealtimeResults([]);
+  };
+
+  const testBackendConnection = async () => {
+    try {
+      console.log('Testing backend connection to:', API_BASE);
+      const response = await fetch(`${API_BASE}/health`);
+      console.log('Response status:', response.status);
+      console.log('Response headers:', [...response.headers.entries()]);
+      
+      const data = await response.json();
+      console.log('Response data:', data);
+      
+      if (response.ok) {
+        setSuccess(`Backend connection successful! Status: ${data.status}`);
+        setError("");
+      } else {
+        setError(`Backend responded with status: ${response.status}`);
+      }
+    } catch (err) {
+      console.error('Backend connection test failed:', err);
+      setError(`Connection test failed: ${err.message}`);
+    }
   };
 
   const styles = {
@@ -660,6 +700,18 @@ function App() {
         </div>
 
         <div style={styles.footer}>
+          <button 
+            onClick={testBackendConnection}
+            style={{
+              ...styles.button,
+              fontSize: '0.7rem',
+              padding: '8px 12px',
+              marginBottom: '10px'
+            }}
+          >
+            TEST BACKEND CONNECTION
+          </button>
+          <br />
           C++ TRIE × REACT × CANVAS ANIMATIONS
         </div>
       </div>
