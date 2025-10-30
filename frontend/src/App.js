@@ -11,8 +11,9 @@ function App() {
   const canvasRef = useRef();
   const animationRef = useRef();
 
+  // Force the correct backend URL for debugging
   const API_BASE = process.env.NODE_ENV === 'production'
-    ? process.env.REACT_APP_API_URL || 'https://word-lookup-backend.onrender.com'
+    ? 'https://searchoptimally.onrender.com'
     : 'http://localhost:8080';
 
   // Debug logging
@@ -261,19 +262,19 @@ function App() {
     try {
       const url = `${API_BASE}/search/${encodeURIComponent(query.trim())}`;
       console.log('Making realtime search request to:', url);
-      
+
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      
+
       console.log('Realtime search response status:', response.status);
-      
+
       const data = await response.json();
       console.log('Realtime search response data:', data);
-      
+
       if (response.ok) {
         setRealtimeResults(data.suggestions || []);
       }
@@ -361,22 +362,26 @@ function App() {
   const testBackendConnection = async () => {
     try {
       console.log('Testing backend connection to:', API_BASE);
+      
+      // Simple fetch without extra headers
       const response = await fetch(`${API_BASE}/health`);
       console.log('Response status:', response.status);
-      console.log('Response headers:', [...response.headers.entries()]);
+      console.log('Response ok:', response.ok);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
       
       const data = await response.json();
       console.log('Response data:', data);
       
-      if (response.ok) {
-        setSuccess(`Backend connection successful! Status: ${data.status}`);
-        setError("");
-      } else {
-        setError(`Backend responded with status: ${response.status}`);
-      }
+      setSuccess(`✅ Backend connection successful! Status: ${data.status}`);
+      setError("");
+      
     } catch (err) {
       console.error('Backend connection test failed:', err);
-      setError(`Connection test failed: ${err.message}`);
+      setError(`❌ Connection failed: ${err.message} (URL: ${API_BASE})`);
+      setSuccess("");
     }
   };
 
@@ -700,7 +705,7 @@ function App() {
         </div>
 
         <div style={styles.footer}>
-          <button 
+          <button
             onClick={testBackendConnection}
             style={{
               ...styles.button,
