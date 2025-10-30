@@ -15,6 +15,27 @@ function App() {
     ? process.env.REACT_APP_API_URL || 'https://word-lookup-backend.onrender.com'
     : 'http://localhost:8080';
 
+  // Debug logging
+  console.log('Environment:', process.env.NODE_ENV);
+  console.log('API_BASE:', API_BASE);
+  console.log('REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+
+  // Test backend connection on component mount
+  useEffect(() => {
+    const testConnection = async () => {
+      try {
+        console.log('Testing backend connection to:', API_BASE);
+        const response = await fetch(`${API_BASE}/health`);
+        const data = await response.json();
+        console.log('Backend connection test successful:', data);
+      } catch (err) {
+        console.error('Backend connection test failed:', err);
+        console.error('Make sure backend URL is correct:', API_BASE);
+      }
+    };
+    testConnection();
+  }, [API_BASE]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -272,7 +293,8 @@ function App() {
         setResults([]);
       }
     } catch (err) {
-      setError("Connection failed");
+      console.error("Search error:", err);
+      setError(`Connection failed: ${err.message}. Backend URL: ${API_BASE}`);
       setResults([]);
     } finally {
       setLoading(false);
@@ -300,7 +322,8 @@ function App() {
         setError(data.error || "Insert failed");
       }
     } catch (err) {
-      setError("Connection failed");
+      console.error("Insert error:", err);
+      setError(`Connection failed: ${err.message}. Backend URL: ${API_BASE}`);
     } finally {
       setLoading(false);
     }
