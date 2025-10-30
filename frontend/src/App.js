@@ -362,22 +362,22 @@ function App() {
   const testBackendConnection = async () => {
     try {
       console.log('Testing backend connection to:', API_BASE);
-      
+
       // Simple fetch without extra headers
       const response = await fetch(`${API_BASE}/health`);
       console.log('Response status:', response.status);
       console.log('Response ok:', response.ok);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
       console.log('Response data:', data);
-      
+
       setSuccess(`✅ Backend connection successful! Status: ${data.status}`);
       setError("");
-      
+
     } catch (err) {
       console.error('Backend connection test failed:', err);
       setError(`❌ Connection failed: ${err.message} (URL: ${API_BASE})`);
@@ -705,18 +705,6 @@ function App() {
         </div>
 
         <div style={styles.footer}>
-          <button
-            onClick={testBackendConnection}
-            style={{
-              ...styles.button,
-              fontSize: '0.7rem',
-              padding: '8px 12px',
-              marginBottom: '10px'
-            }}
-          >
-            TEST BACKEND CONNECTION
-          </button>
-          <br />
           C++ TRIE × REACT × CANVAS ANIMATIONS
         </div>
       </div>
