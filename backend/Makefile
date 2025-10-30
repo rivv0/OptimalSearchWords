@@ -1,5 +1,14 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -I/opt/homebrew/include
+
+# Detect if we're on macOS (Darwin) or Linux
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+    # macOS with Homebrew
+    CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -I/opt/homebrew/include
+else
+    # Linux (including Docker)
+    CXXFLAGS = -std=c++17 -Wall -Wextra -O2
+endif
 
 all: server
 

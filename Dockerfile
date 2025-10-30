@@ -1,10 +1,12 @@
 FROM ubuntu:22.04
 
-# Install dependencies
+# Install dependencies including ASIO
 RUN apt-get update && apt-get install -y \
     g++ \
     make \
     curl \
+    libasio-dev \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
