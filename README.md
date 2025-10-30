@@ -1,50 +1,130 @@
+# Smart Word Lookup - Autocomplete System
 
-# Optimal Search Words
+A high-performance autocomplete system built with React frontend and C++ backend using Trie data structure.
 
-A small project that explores **efficient word search** using a **Trie data structure** with **LRU-based caching**.
-The idea is simple: store a dictionary of words, and when a user searches, they get the most frequent or recently used matches quickly.
+## Features
 
-It also has a **C++ backend (Crow)** serving APIs and a **React frontend** to try things out.
+- **Fast Autocomplete**: Trie-based search with O(k) complexity where k is the prefix length
+- **Real-time Search**: Live suggestions as you type
+- **Word Database**: Pre-loaded with 900+ common English words
+- **LRU Caching**: Efficient caching for frequently searched prefixes
+- **Modern UI**: Beautiful, responsive React interface
+- **CORS Enabled**: Full cross-origin support
 
----
+## Architecture
 
-##  Features
+### Backend (C++)
+- **Trie Data Structure**: Efficient prefix-based search
+- **Crow Web Framework**: Fast HTTP server
+- **LRU Cache**: Memory-efficient caching system
+- **Word Loading**: Supports both file-based and hardcoded word lists
 
-*  Trie-based insertion and search
-*  LRU cache to speed up frequent lookups
-*  REST API (C++ / Crow) to interact with the data
-*  React frontend to visualize and test search
-
-----
-
-## Project Structure
-
-```
-OptimalSearchWords/
-├── backend/            # C++ server using Crow
-│   ├── trie.cpp        # Trie + LRU cache logic
-│   ├── server.cpp      # Crow server exposing APIs
-│   └── ...
-├── frontend/           # React app
-│   ├── src/
-│   └── ...
-└── README.md
-```
+### Frontend (React)
+- **Real-time Search**: Debounced search with 300ms delay
+- **Modern UI**: Gradient design with hover effects
+- **Error Handling**: Comprehensive error states
+- **Responsive Design**: Works on all screen sizes
 
 ## API Endpoints
 
-* `GET /search?word=abc` → returns matches (with LRU/frequency handling)
-* `POST /insert` → add a new word to the Trie
-* `GET /all_words` → list all words in the dictionary
+### Search Words
+```
+GET /search/{prefix}
+```
+Returns autocomplete suggestions for the given prefix.
 
----
+**Response:**
+```json
+{
+  "prefix": "hel",
+  "suggestions": ["help", "hello", "heart"],
+  "count": 3
+}
+```
 
-##  Scalability and future enhancements
+### Add Word
+```
+GET /insert/{word}
+```
+Adds a new word to the trie.
 
-* External dictionary loader (fetch from API)
-* Store search stats in SQLite/Postgres
-* Add ranking tweaks (popularity + recency)
-* UI improvements (search suggestions dropdown)
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Word inserted",
+  "word": "example"
+}
+```
 
+### Remove Word
+```
+GET /remove/{word}
+```
+Removes a word from the trie.
 
+### Get Definition (Future)
+```
+GET /define/{word}
+```
+Returns word definition (placeholder for dictionary API integration).
 
+## Running the Application
+
+### Backend
+```bash
+cd backend
+make
+./server
+```
+Server runs on http://localhost:8080
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm start
+```
+Frontend runs on http://localhost:3000
+
+## Word Database
+
+The system loads words from `backend/words.txt`. You can:
+1. Add new words to the file (one per line)
+2. Restart the server to reload words
+3. Use the web interface to add words dynamically
+
+## Performance
+
+- **Search Time**: O(k) where k is prefix length
+- **Memory Usage**: Optimized trie structure
+- **Caching**: LRU cache for frequent searches
+- **Concurrent**: Multi-threaded server support
+
+## Future Enhancements
+
+- [ ] Dictionary API integration for definitions
+- [ ] Word frequency scoring
+- [ ] Fuzzy search support
+- [ ] Database persistence
+- [ ] User authentication
+- [ ] Custom word lists per user
+
+## Technology Stack
+
+- **Backend**: C++17, Crow Framework, ASIO
+- **Frontend**: React, Modern CSS
+- **Data Structure**: Trie with LRU Cache
+- **Build System**: Make, npm
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details.
