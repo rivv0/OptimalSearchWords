@@ -12,7 +12,7 @@ function App() {
   const animationRef = useRef();
 
   const API_BASE = process.env.NODE_ENV === 'production'
-    ? 'https://your-backend-url.com'
+    ? process.env.REACT_APP_API_URL || 'https://word-lookup-backend.onrender.com'
     : 'http://localhost:8080';
 
   useEffect(() => {
@@ -112,7 +112,7 @@ function App() {
         ctx.moveTo(i, 0);
         ctx.lineTo(0, i);
         ctx.stroke();
-        
+
         ctx.beginPath();
         ctx.moveTo(canvas.width - i, 0);
         ctx.lineTo(canvas.width, i);
@@ -135,24 +135,24 @@ function App() {
         ctx.shadowBlur = 8;
         ctx.fillStyle = `rgba(${particle.color.r}, ${particle.color.g}, ${particle.color.b}, ${particle.alpha})`;
         ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
-        
+
         // Reset shadow
         ctx.shadowBlur = 0;
-        
+
         // Draw connecting lines between nearby particles
         particles.forEach((otherParticle, j) => {
           if (i !== j) {
             const dx = particle.x - otherParticle.x;
             const dy = particle.y - otherParticle.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            
+
             if (distance < 100) {
               const opacity = (100 - distance) / 100 * 0.3;
               ctx.strokeStyle = `rgba(120, 120, 140, ${opacity})`;
               ctx.lineWidth = 0.5;
               ctx.beginPath();
-              ctx.moveTo(particle.x + particle.size/2, particle.y + particle.size/2);
-              ctx.lineTo(otherParticle.x + otherParticle.size/2, otherParticle.y + otherParticle.size/2);
+              ctx.moveTo(particle.x + particle.size / 2, particle.y + particle.size / 2);
+              ctx.lineTo(otherParticle.x + otherParticle.size / 2, otherParticle.y + otherParticle.size / 2);
               ctx.stroke();
             }
           }
@@ -163,18 +163,18 @@ function App() {
       mouseTrail.forEach((trail, i) => {
         const alpha = (trail.life / trail.maxLife);
         const size = alpha * 6;
-        
+
         // Draw glow effect for trail
         ctx.shadowColor = `rgba(200, 200, 220, ${alpha})`;
         ctx.shadowBlur = 10;
         ctx.fillStyle = `rgba(200, 200, 220, ${alpha * 0.8})`;
-        ctx.fillRect(trail.x - size/2, trail.y - size/2, size, size);
-        
+        ctx.fillRect(trail.x - size / 2, trail.y - size / 2, size, size);
+
         // Draw inner bright core
         ctx.shadowBlur = 0;
         ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.6})`;
         ctx.fillRect(trail.x - 1, trail.y - 1, 2, 2);
-        
+
         trail.life--;
       });
 
@@ -231,6 +231,7 @@ function App() {
     } else {
       setRealtimeResults([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   const handleRealtimeSearch = async () => {
